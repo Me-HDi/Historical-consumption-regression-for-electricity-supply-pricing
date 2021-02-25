@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# ### The useful function used to solve the prediction problem of the Data Challenge
-
 # In[1]:
+#  The useful functions used to solve the prediction problem of the Data Challenge
 
+import holidays
 
 def timefeatures(df):
     ''' This function creates time features and add them to the DataFrame file'''
@@ -17,5 +17,12 @@ def timefeatures(df):
     df['weekofyear'] = df.index.weekofyear
     df['dayofweek'] = df.index.dayofweek
 
-    return df
+
+def isHoliday(df):
+    fr_holidays = holidays.France()
+    df['isHoliday'] = df.timestamp.apply(lambda x:1 if x in fr_holidays else 0)
+
+
+def isWeekend(df):
+    df['isWeekend'] = df['dayofweek'].apply(lambda x: 1 if x in [5,6] else 0)
 

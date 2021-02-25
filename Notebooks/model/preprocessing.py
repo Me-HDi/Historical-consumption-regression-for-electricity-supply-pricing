@@ -43,7 +43,11 @@ class Data:
                                     "loc_secondary_2", 
                                     "loc_secondary_3"],
                                    axis = 1)
+        # add is holiday feature
+        need.isHoliday(self.data_train)
+        need.isHoliday(self.data_test)
 
+        # convert timestamp to index
         self.data_train.timestamp = pd.to_datetime(self.data_train.timestamp)
         self.data_test.timestamp = pd.to_datetime(self.data_test.timestamp)
 
@@ -52,9 +56,13 @@ class Data:
         self.data_train = self.data_train.set_index('timestamp')
 
         # add time features
-        self.data_train = need.timefeatures(self.data_train)
-        self.data_test = need.timefeatures(self.data_test)
+        need.timefeatures(self.data_train)
+        need.timefeatures(self.data_test)
 
+        # add is weekend feature
+        need.isWeekend(self.data_train)
+        need.isWeekend(self.data_test)
+	
         ## add smoothing temp and humidity
         self.data_train['temp_1_smooth7D'] = self.data_train['temp_1'].interpolate().rolling(24*7).mean().fillna(method='bfill').round(decimals=1)
         self.data_train['temp_2_smooth7D'] = self.data_train['temp_2'].interpolate().rolling(24*7).mean().fillna(method='bfill').round(decimals=1)
@@ -70,29 +78,38 @@ class Data:
 
 
     def get_data_split(self):
-
+        # split data train and test of the two sites 
         X_train1 = self.data_train.drop(['temp_2',
 					'humidity_2',
 					'temp_2_smooth7D',
                             		'humidity_2_smooth7D'], axis=1)
+
         X_train2 = self.data_train.drop(['temp_1',
 					'humidity_1',
 					'temp_1_smooth7D',
 					'humidity_1_smooth7D'], axis=1)
         
-        X_test1 = self.data_test[features_1]
-        X_test2 = self.data_test[features_2]
-        
+        X_test1 = self.data_test.drop(['temp_2',
+					'humidity_2',
+					'temp_2_smooth7D',
+					'humidity_2_smooth7D'], axis=1)
+
+        X_test2 = self.data_test.drop(['temp_1',
+					'humidity_1',
+					'temp_1_smooth7D',
+					'humidity_1_smooth7D'], axis=1)
+
         return X_train1,X_train2,X_test1,X_test2
     
     
     def get_split_y_data(self):
-	
+	# split the data target of the two sites 
         self.y_data=self.y_data.set_index(self.data_train.index)
 
         y_train1 = self.y_data['consumption_1']
         y_train2 = self.y_data['consumption_2']
         
         return y_train1,y_train2
+    
         
 

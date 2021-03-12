@@ -3,6 +3,10 @@
 
 # # Data Challenge : Historical consumption regression for electricity supply pricing
 
+## This model helps the pre-processing automation of our data set. 
+## It includes all the funtion needed for dealing with missing values, adding features, normalisation and handling data type.
+
+
 # # # Importings
 
 from datetime import datetime
@@ -76,7 +80,7 @@ class Data:
         self.data_test['humidity_1_smooth7D'] = self.data_test['humidity_1'].interpolate().rolling(24*7).mean().fillna(method='bfill').round()
         self.data_test['humidity_2_smooth7D'] = self.data_test['humidity_2'].interpolate().rolling(24*7).mean().fillna(method='bfill').round()
 
-        ## Normalising our data
+        ## Normalising and inetrpolating features with missing data
         scaler = MinMaxScaler()
         self.data_train[['temp_1', 'temp_2', 
                  'mean_national_temp',
@@ -120,7 +124,8 @@ class Data:
         self.data_test=self.data_test.interpolate()
 
     	
-
+	
+    ## defining our train and test data
     def get_data_split(self):
         # split data train and test of the two sites 
         X_train1 = self.data_train.drop(['temp_2',
